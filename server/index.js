@@ -71,7 +71,7 @@ app.get('/similarArtists/:artist', (req, res) => {
     let Artist = ArtistName;
     fetch(`http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=${artist}&api_key=${apiKey}&format=json`)
         .then(response => response.json())
-        .then(data => res.json(data));
+        .then(data => res.send(data));
 });
 app.post('/setArtist', (req, res) => {
     let { name } = req.body;
@@ -82,7 +82,7 @@ app.post('/setArtist', (req, res) => {
 app.get('/chartTopTracks', (req, res) => {
     fetch(`https://ws.audioscrobbler.com/2.0/?method=chart.gettoptracks&api_key=${apiKey}&format=json`)
         .then(response => response.json())
-        .then(data => res.json(data))
+        .then(data => res.send(data))
 })
 app.get('/artists1', (req, res) => {
     fetch(`http://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&api_key=${apiKey}&format=json&page=1`)
