@@ -1,5 +1,6 @@
 import express from 'express'
 import fetch from 'node-fetch'
+import axios from 'axios';
 import cors from 'cors'
 import dotenv from 'dotenv';
 
@@ -99,6 +100,18 @@ app.get('/artists3', (req, res) => {
         .then(response => response.json())
         .then(data => res.send(data.artists));
 })
+
+
+
+app.get('/artistImage/:artist', async (req, res) => {
+    const { artist } = req.params;
+    try {
+        const response = await axios.get(`https://api.deezer.com/search?q=artist:${artist}`);
+        res.json(response.data);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch data from Deezer API' });
+    }
+});
 
 app.listen(PORT, () => {
     console.log('Server running on ', PORT);
