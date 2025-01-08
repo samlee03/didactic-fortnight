@@ -107,8 +107,18 @@ app.get('/artistImage/:artist', async (req, res) => {
     const { artist } = req.params;
     try {
         const response = await axios.get(`https://api.deezer.com/search?q=artist:${artist}`);
-        res.json(response.data);
+        const artistData = response.data.data.find(item => 
+            item.artist.name.toLowerCase() === artist.toLowerCase()
+        );
+
+        if (artistData) {
+            res.json({ imageUrl: artistData.artist.picture });
+        } else {
+            // If no artist found, return a default placeholder image
+            res.json({ imageUrl: "https://placehold.co/150x150" });
+        }
     } catch (error) {
+        // Handle the error gracefully
         res.status(500).json({ error: 'Failed to fetch data from Deezer API' });
     }
 });

@@ -18,7 +18,7 @@ function App() {
   const apiKey = import.meta.env.VITE_MY_SECRET_API_KEY;
   const [allArtists, setAllArtists] = useState([]);
 
-  const [displayStats, setDisplayStats] = useState(true);
+  const [displayStats, setDisplayStats] = useState(false);
   const [inputText, setInputText] = useState("");
 
   // Initial Fetch
@@ -28,8 +28,9 @@ function App() {
       const data = await response.json();
       setArtist(data.artist);
     }
-    fetchArtist();
-
+    let myArtist = "Post Malone"
+    setArtist(myArtist);
+    // fetchArtist();
     const retrieveArtists = async (num) => {
       const response = await fetch(`http://localhost:3000/artists${num}`)
       const data = await response.json()
@@ -38,6 +39,8 @@ function App() {
     retrieveArtists(1);
     retrieveArtists(2);
     retrieveArtists(3);
+    // allArtists ? setArtist(allArtists[Math.floor(Math.random() * allArtists.length)]) : setArtist("Post Malone");
+    // setArtist(allArtists[Math.floor(Math.random() * allArtists.length)]);
   }, [])
 
   // 
@@ -96,7 +99,7 @@ function App() {
       const data = await response.json();
 
       setArtistInfo(data);
-      console.log(artistInfo);    
+      // console.log(artistInfo);    
     }
       const fetchArtistPicture = async () => {
         try {
@@ -105,20 +108,14 @@ function App() {
             throw new Error(`Error fetching top tracks: ${response.status}`);
           }
           const data = await response.json();
-          for (let i = 0; i < data.data.length; i++) {
-            if (data.data[i].artist.name.toLowerCase() === artist.toLowerCase()) {
-              // If the name matches, get the image URL
-              const imageUrl = data.data[i].artist.picture;
-              console.log(`${artist}'s image URL:`, imageUrl);
-              setArtistPicture(imageUrl);
-              return imageUrl;  // Return the image URL for the correct artist
-            }
-          }
-          setArtistPicture("https://placehold.co/300x300");
+          // console.log("Good")
+          // console.log(data);
+          setArtistPicture(data.imageUrl);
+          // setArtistPicture("https://placehold.co/300x300");
           // setArtistPicture(data.data[0].artist.picture);
         } catch (error) {
           console.error(error);
-          setArtistPicture();
+          setArtistPicture("https://placehold.co/150x150");
         }
       }
     fetchTopTracks();
@@ -158,24 +155,27 @@ function App() {
   const submitArtist = () => {
     if (inputText.toLowerCase() == artist.toLowerCase()){
       setDisplayStats(true);
+      setInputText("");
     }
-    console.log("submited", inputText, " ,  while artist is ", artist);
+    // console.log("submited", inputText, " ,  while artist is ", artist);
+  }
+
+  const revealArtist = () => {
+    setDisplayStats(true);
+    setInputText("");
   }
 
   return (
     <>
-      <div>
-        {/* <Tracks tracks={data.toptracks.track.slice(0, 3)}/> */}
-        {/* {!data ? <></> : <Tracks tracks={data?.toptracks?.track.slice(0, 3)}/>} */}
-        {/* {!topTracks ? <></> : <p>{topTracks}</p>} */}
+      <div className="App">
+        <div className="container">
         {displayStats 
           ?
             
-            <div>
+            <div className='bio-card'>
               <h2> Artist: {artist} </h2>
               {!artistPicture ? <></> : <img src={artistPicture}/>}
-              {!artistPicture ? <></> : <p>{artistPicture}</p>}
-              <p>
+              <p className='bio'>
                 
                 {!artistInfo ? (
                   <></>  // Render nothing if artistInfo is not available
@@ -193,9 +193,9 @@ function App() {
             </div>
           :
           <>
-            <h2>Artist: ???</h2> <button onClick={randomizeArtist}>New Artist</button>
-            <input value={inputText} onChange={(e) => setInputText(e.target.value)}/><button onClick={submitArtist}>Submit</button><button onClick={getHint}>Hint?</button>
-            <h4>Top Tracks</h4>
+            <h2>Guess the Artist! </h2>
+            <input placeholder="Guess the artist.." value={inputText} onChange={(e) => setInputText(e.target.value)}/><button onClick={submitArtist}>Submit</button>
+            <h3>Top Tracks</h3>
             {!topTracks ? (
               <></>
             ) : (
@@ -205,14 +205,16 @@ function App() {
                 ))}
               </ul>
             )}
-            <h4>Top Albums</h4>
-            {(!topAlbums || !hints[0]) ? <></> : <p>Album Name: {topAlbums.topalbums.album[0].name}</p>}
-            {/* {!similarArtists ? <></> : <p>Similar Artists: {similarArtists.similarartists.artist[0].name}</p>} */}
-            <h4>Similar Artists</h4>
-            {!similarArtists || !hints[1]? <></> : <p>Similar Artists: {similarArtists.filter(e => e != artist).map((artist, index) => (<li key={index}>{artist}</li>))}</p>}
-            {/* {!similarArtists ? <></> : <p>Similar Artists: {similarArtists}</p>} */}
+            <h3>Top Albums</h3>
+            {(!topAlbums || !hints[0]) ? <span>???</span> : <p>Album Name: {topAlbums.topalbums.album[0].name}</p>}
+            <h3>Similar Artists</h3>
+            {!similarArtists || !hints[1]? <span>???</span> : <p>Similar Artists: {similarArtists.filter(e => e != artist).map((artist, index) => (<li key={index}>{artist}</li>))}</p>}
+            <div>
+              <button className='big-buttons' onClick={getHint}>Hint?</button> <button className='big-buttons' onClick={revealArtist}>New Artist</button>
+            </div>
           </>
         }
+        </div>
       </div>  
     </>
   )
